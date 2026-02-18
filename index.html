@@ -3,52 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuickIQ - Teste Cognitivo</title>
+<title>QuickIQ - Avaliação Cognitiva</title>
 
 <style>
-body {
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-    background: radial-gradient(circle at top,#151522,#090910);
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:radial-gradient(circle at top,#141421,#07070d);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.card {
-    width:92%;
-    max-width:430px;
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(30px);
-    border-radius:26px;
-    padding:28px;
-    text-align:center;
-    box-shadow:0 30px 80px rgba(0,0,0,0.8);
+.card{
+width:95%;
+max-width:500px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(25px);
+border-radius:24px;
+padding:25px;
+box-shadow:0 30px 80px rgba(0,0,0,0.8);
 }
 
-h1 {
-    font-size:20px;
-    margin-bottom:20px;
+.header{
+display:flex;
+justify-content:space-between;
+font-size:14px;
+opacity:.8;
+margin-bottom:15px;
 }
 
-.question {
-    font-size:18px;
-    margin-bottom:20px;
+.progress-bar{
+width:100%;
+height:6px;
+background:rgba(255,255,255,.1);
+border-radius:10px;
+overflow:hidden;
+margin-bottom:20px;
 }
 
-button {
-    width:100%;
-    padding:14px;
-    border-radius:16px;
-    border:none;
-    margin:6px 0;
-    font-weight:bold;
-    font-size:15px;
-    cursor:pointer;
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    color:white;
+.progress{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#6366f1,#a855f7);
+transition:.3s;
+}
+
+.question{
+font-size:18px;
+margin-bottom:20px;
+min-height:60px;
+}
+
+button{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:none;
+margin:6px 0;
+font-weight:600;
+cursor:pointer;
+background:linear-gradient(135deg,#6366f1,#a855f7);
+color:white;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.02);
 }
 </style>
 </head>
@@ -56,78 +79,112 @@ button {
 <body>
 
 <div class="card">
-<h1>Teste Cognitivo Rápido</h1>
+
+<div class="header">
+<div id="counter">Pergunta 1/30</div>
+<div id="timer">05:00</div>
+</div>
+
+<div class="progress-bar">
+<div class="progress" id="progress"></div>
+</div>
 
 <div class="question" id="question"></div>
-
 <div id="answers"></div>
 
 </div>
 
 <script>
 
+const TOTAL_TIME = 300; // 5 minutos
+let timeLeft = TOTAL_TIME;
+let timerInterval;
+
 const questions = [
-{
-q:"Qual número completa a sequência: 2, 4, 8, 16, ?",
-a:["18","24","32","20"],
-correct:2
-},
-{
-q:"Qual palavra não pertence ao grupo?",
-a:["Maçã","Banana","Carro","Uva"],
-correct:2
-},
-{
-q:"Se todos os A são B e alguns B são C, então:",
-a:["Todos A são C","Alguns A podem ser C","Nenhum A é C","Todos C são A"],
-correct:1
-},
-{
-q:"Qual é o próximo número: 5, 10, 20, 40, ?",
-a:["45","60","80","100"],
-correct:2
-},
-{
-q:"Se você reorganizar as letras 'ROMA', forma:",
-a:["Amor","Ramo","Mora","Todas acima"],
-correct:3
-}
+{q:"2, 6, 12, 20, 30, ?",a:["36","40","42","48"],c:2},
+{q:"Se todos os X são Y e nenhum Y é Z, então:",a:["Algum X é Z","Nenhum X é Z","Todo Z é X","Algum Y é X"],c:1},
+{q:"Qual número completa: 1, 4, 9, 16, ?",a:["20","24","25","36"],c:2},
+{q:"Se A=1, B=2, C=3, então CAB equivale a:",a:["312","213","123","231"],c:1},
+{q:"Qual palavra não pertence ao grupo?",a:["Cubo","Esfera","Pirâmide","Triângulo"],c:3},
+{q:"5, 7, 11, 17, 25, ?",a:["35","33","37","29"],c:1},
+{q:"Se 3 máquinas fazem 3 peças em 3 minutos, 6 máquinas fazem 6 peças em:",a:["3 min","6 min","9 min","12 min"],c:0},
+{q:"Qual é o próximo número: 8, 16, 32, ?",a:["40","48","64","56"],c:2},
+{q:"Qual alternativa é análoga a: Livro está para Ler assim como Música está para:",a:["Ouvir","Cantar","Tocar","Dançar"],c:0},
+{q:"Qual número completa: 3, 9, 27, ?",a:["54","81","72","90"],c:1},
+
+{q:"Se João é mais alto que Pedro e Pedro é mais alto que Ana:",a:["Ana é mais alta que João","João é mais baixo que Ana","João é mais alto que Ana","Pedro é mais alto que João"],c:2},
+{q:"Qual número não pertence: 2, 3, 5, 7, 9, 11",a:["2","9","11","7"],c:1},
+{q:"Se hoje é terça e daqui 10 dias será:",a:["Quinta","Sexta","Sábado","Domingo"],c:1},
+{q:"Qual número completa: 4, 7, 13, 25, ?",a:["41","49","45","37"],c:0},
+{q:"Qual palavra é sinônimo de 'efêmero'?",a:["Duradouro","Breve","Intenso","Complexo"],c:1},
+{q:"2, 3, 5, 9, 17, ?",a:["33","31","29","35"],c:1},
+{q:"Qual alternativa completa: 10, 20, 15, 30, 25, ?",a:["35","40","50","45"],c:3},
+{q:"Se 4x = 20, então 2x =",a:["5","10","20","8"],c:1},
+{q:"Qual número completa: 100, 90, 70, 40, ?",a:["10","20","15","0"],c:0},
+{q:"Qual palavra é antônimo de 'expansivo'?",a:["Sociável","Introvertido","Amável","Falante"],c:1},
+
+{q:"1, 1, 2, 3, 5, 8, ?",a:["11","13","12","10"],c:1},
+{q:"Qual número completa: 6, 12, 24, 48, ?",a:["72","84","96","108"],c:2},
+{q:"Se todos os gatos miam e Rex mia, então:",a:["Rex é gato","Rex pode ser gato","Rex não é gato","Todos miam"],c:1},
+{q:"Qual número não pertence: 16, 25, 36, 49, 64, 81, 100, 121, 150",a:["49","81","150","100"],c:2},
+{q:"Qual alternativa mantém padrão: AB, BC, CD, ?",a:["DE","CE","AD","BD"],c:0},
+{q:"Se um trem anda 60km em 1h, em 30min anda:",a:["20km","25km","30km","35km"],c:2},
+{q:"Qual número completa: 7, 14, 28, 56, ?",a:["84","98","112","120"],c:2},
+{q:"Qual é o próximo número: 9, 18, 21, 42, 45, ?",a:["90","84","88","96"],c:0},
+{q:"Qual palavra é diferente: Azul, Verde, Vermelho, Quadrado",a:["Azul","Verde","Vermelho","Quadrado"],c:3},
+{q:"3, 6, 18, 72, ?",a:["144","216","360","288"],c:3}
 ];
 
 let current = 0;
 let score = 0;
 
-function loadQuestion() {
-    const q = questions[current];
-    document.getElementById("question").innerText = q.q;
+function startTimer(){
+timerInterval = setInterval(()=>{
+timeLeft--;
+let minutes = Math.floor(timeLeft/60);
+let seconds = timeLeft%60;
+document.getElementById("timer").innerText =
+`${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
 
-    const answersDiv = document.getElementById("answers");
-    answersDiv.innerHTML = "";
-
-    q.a.forEach((option,index)=>{
-        const btn = document.createElement("button");
-        btn.innerText = option;
-        btn.onclick = ()=>selectAnswer(index);
-        answersDiv.appendChild(btn);
-    });
+if(timeLeft <= 0){
+clearInterval(timerInterval);
+finishTest();
+}
+},1000);
 }
 
-function selectAnswer(index) {
-    if(index === questions[current].correct){
-        score++;
-    }
+function loadQuestion(){
+const q = questions[current];
+document.getElementById("question").innerText = q.q;
+document.getElementById("counter").innerText = `Pergunta ${current+1}/30`;
+document.getElementById("progress").style.width = ((current/30)*100)+"%";
 
-    current++;
+const answersDiv = document.getElementById("answers");
+answersDiv.innerHTML="";
 
-    if(current < questions.length){
-        loadQuestion();
-    } else {
-        localStorage.setItem("score", score);
-        localStorage.setItem("paid", "false");
-        window.location.href = "resultado.html";
-    }
+q.a.forEach((option,index)=>{
+const btn=document.createElement("button");
+btn.innerText=option;
+btn.onclick=()=>selectAnswer(index);
+answersDiv.appendChild(btn);
+});
 }
 
+function selectAnswer(index){
+if(index===questions[current].c){score++;}
+current++;
+if(current<questions.length){loadQuestion();}
+else{finishTest();}
+}
+
+function finishTest(){
+clearInterval(timerInterval);
+localStorage.setItem("score",score);
+localStorage.setItem("paid","false");
+window.location.href="resultado.html";
+}
+
+startTimer();
 loadQuestion();
 
 </script>
