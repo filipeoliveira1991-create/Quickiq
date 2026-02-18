@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultado Confidencial - QuickIQ</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: radial-gradient(circle at top, #151522, #090910);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.card {
+    width: 92%;
+    max-width: 430px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(30px);
+    border-radius: 26px;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    animation: fadeIn 0.8s ease;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.iq-number {
+    font-size: 54px;
+    font-weight: bold;
+    margin: 18px 0;
+    filter: blur(12px);
+    transition: 0.6s ease;
+}
+
+.unlocked {
+    filter: blur(0);
+}
+
+.analysis-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.analysis-progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    border-radius: 12px;
+    transition: width 2s ease;
+}
+
+.message {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 10px;
+    filter: blur(8px);
+    transition: 0.6s ease;
+}
+
+.message.unlocked {
+    filter: blur(0);
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 16px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: 0.3s ease;
+}
+
+.unlock-btn {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: white;
+}
+
+.unlock-btn:hover {
+    transform: scale(1.05);
+}
+
+.share-btn {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.badge {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 8px;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform:translateY(10px);}
+    to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Análise Cognitiva Finalizada</h1>
+
+<div class="iq-number" id="iqValue">---</div>
+
+<div class="analysis-bar">
+    <div class="analysis-progress" id="progressBar"></div>
+</div>
+
+<div class="message" id="message">
+    Processando seu perfil intelectual com base em padrões estatísticos globais...
+</div>
+
+<div id="paywall" style="margin-top:20px; display:none;">
+    <p style="font-size:14px; opacity:0.85;">
+        🔒 Seu resultado completo está pronto.
+    </p>
+    <p style="font-size:13px; opacity:0.6;">
+        Apenas <strong>$0.99</strong> para liberar sua pontuação oficial.
+    </p>
+
+    <button class="unlock-btn" onclick="startPayment()">
+        Ver Meu Resultado Oficial
+    </button>
+
+    <div class="badge">
+        Mais de 12.000 pessoas desbloquearam hoje
+    </div>
+</div>
+
+<button class="share-btn" id="shareBtn" style="display:none;" onclick="shareResult()">
+Compartilhar Resultado
+</button>
+
+</div>
+
+<script>
+
+const score = parseInt(localStorage.getItem("score")) || 18;
+const paid = localStorage.getItem("paid") === "true";
+
+// Ajuste estratégico:
+// Garante maioria entre 105–125 para aumentar satisfação e compartilhamento
+function calculateIQ(score) {
+    let iq = 95 + (score / 30) * 40;
+    if (iq < 100) iq += 5;
+    return Math.round(iq);
+}
+
+const iq = calculateIQ(score);
+
+function getMessage(iq) {
+    if (iq < 105) return "Seu desempenho está dentro da média estatística.";
+    if (iq < 120) return "Você demonstra habilidades cognitivas acima da média.";
+    return "Seu resultado indica capacidade intelectual significativamente elevada.";
+}
+
+function showPaywall() {
+    document.getElementById("paywall").style.display = "block";
+}
+
+function revealResult() {
+    const iqEl = document.getElementById("iqValue");
+    const msgEl = document.getElementById("message");
+
+    iqEl.innerText = iq;
+    msgEl.innerText = getMessage(iq);
+
+    iqEl.classList.add("unlocked");
+    msgEl.classList.add("unlocked");
+
+    setTimeout(() => {
+        document.getElementById("progressBar").style.width = (iq / 140 * 100) + "%";
+    }, 300);
+
+    document.getElementById("paywall").style.display = "none";
+    document.getElementById("shareBtn").style.display = "block";
+}
+
+function startPayment() {
+    // Aqui você conecta Stripe Checkout real
+    // Exemplo:
+    // window.location.href = "https://checkout.stripe.com/...";
+    
+    localStorage.setItem("paid", "true");
+    revealResult();
+}
+
+function shareResult() {
+    const text = `Meu QI estimado foi ${iq}. Faça o teste também!`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: "Meu Resultado de QI",
+            text: text,
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(text);
+        alert("Resultado copiado!");
+    }
+}
+
+if (paid) {
+    revealResult();
+} else {
+    setTimeout(showPaywall, 2500); // Delay psicológico antes de mostrar preço
+}
+
+</script>
+
+</body>
+</html>
