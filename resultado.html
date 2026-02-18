@@ -3,229 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resultado Confidencial - QuickIQ</title>
+<title>Resultado - QuickIQ</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: radial-gradient(circle at top, #151522, #090910);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:#0f0f17;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.card {
-    width: 92%;
-    max-width: 430px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(30px);
-    border-radius: 26px;
-    padding: 28px;
-    text-align: center;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-    animation: fadeIn 0.8s ease;
+.card{
+width:95%;
+max-width:500px;
+background:rgba(255,255,255,0.05);
+border-radius:24px;
+padding:25px;
+box-shadow:0 30px 80px rgba(0,0,0,0.8);
+text-align:center;
 }
 
-h1 {
-    font-size: 20px;
-    font-weight: 500;
-    opacity: 0.9;
+button{
+margin-top:20px;
+padding:14px;
+width:100%;
+border:none;
+border-radius:14px;
+font-weight:600;
+cursor:pointer;
+background:linear-gradient(135deg,#6366f1,#a855f7);
+color:white;
+transition:.2s;
 }
 
-.iq-number {
-    font-size: 54px;
-    font-weight: bold;
-    margin: 18px 0;
-    filter: blur(12px);
-    transition: 0.6s ease;
+button:hover{
+transform:scale(1.02);
 }
 
-.unlocked {
-    filter: blur(0);
+h1{
+margin:10px 0;
+font-size:42px;
 }
-
-.analysis-bar {
-    width: 100%;
-    height: 10px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    margin: 15px 0;
+p{
+margin-top:15px;
+line-height:1.5;
+opacity:.85;
 }
-
-.analysis-progress {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #6366f1, #a855f7);
-    border-radius: 12px;
-    transition: width 2s ease;
-}
-
-.message {
-    font-size: 14px;
-    opacity: 0.85;
-    margin-top: 10px;
-    filter: blur(8px);
-    transition: 0.6s ease;
-}
-
-.message.unlocked {
-    filter: blur(0);
-}
-
-button {
-    width: 100%;
-    padding: 15px;
-    border-radius: 16px;
-    border: none;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 14px;
-    transition: 0.3s ease;
-}
-
-.unlock-btn {
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    color: white;
-}
-
-.unlock-btn:hover {
-    transform: scale(1.05);
-}
-
-.share-btn {
-    background: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.badge {
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: 8px;
-}
-
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(10px);}
-    to {opacity:1; transform:translateY(0);}
+.small{
+opacity:.6;
+font-size:14px;
+margin-top:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-
-<h1>Análise Cognitiva Finalizada</h1>
-
-<div class="iq-number" id="iqValue">---</div>
-
-<div class="analysis-bar">
-    <div class="analysis-progress" id="progressBar"></div>
-</div>
-
-<div class="message" id="message">
-    Processando seu perfil intelectual com base em padrões estatísticos globais...
-</div>
-
-<div id="paywall" style="margin-top:20px; display:none;">
-    <p style="font-size:14px; opacity:0.85;">
-        🔒 Seu resultado completo está pronto.
-    </p>
-    <p style="font-size:13px; opacity:0.6;">
-        Apenas <strong>$0.99</strong> para liberar sua pontuação oficial.
-    </p>
-
-    <button class="unlock-btn" onclick="startPayment()">
-        Ver Meu Resultado Oficial
-    </button>
-
-    <div class="badge">
-        Mais de 12.000 pessoas desbloquearam hoje
-    </div>
-</div>
-
-<button class="share-btn" id="shareBtn" style="display:none;" onclick="shareResult()">
-Compartilhar Resultado
-</button>
-
-</div>
+<div class="card" id="content"></div>
 
 <script>
-
+// Ler parâmetro ?paid=true
+const urlParams = new URLSearchParams(window.location.search);
+const paid = urlParams.get("paid");
 const score = parseInt(localStorage.getItem("score")) || 0;
-const paid = localStorage.getItem("paid") === "true";
 
-// Ajuste estratégico:
-// Garante maioria entre 105–125 para aumentar satisfação e compartilhamento
-function calculateIQ(score) {
-    let iq = 95 + (score / 30) * 40;
-    if (iq < 100) iq += 5;
-    return Math.round(iq);
+// Função que gera perfil detalhado
+function generateProfile(score){
+
+let iq = 85 + (score * 2.5);
+let description = "";
+
+if(iq < 95){
+description = "Seu desempenho indica capacidade cognitiva funcional dentro da média baixa. Você tende a resolver problemas concretos com maior facilidade do que desafios abstratos complexos. Pode se beneficiar de métodos estruturados e prática contínua em raciocínio lógico.";
+}
+else if(iq < 110){
+description = "Seu perfil demonstra raciocínio consistente e boa capacidade de análise lógica. Você apresenta desempenho sólido em padrões, resolução estruturada de problemas e compreensão de informações verbais e numéricas.";
+}
+else if(iq < 125){
+description = "Seu resultado revela forte habilidade analítica, pensamento estruturado e excelente detecção de padrões. Indica potencial elevado para resolução estratégica, abstração e flexibilidade cognitiva em múltiplos contextos.";
+}
+else{
+description = "Seu perfil cognitivo indica capacidade intelectual superior. Você demonstra alta velocidade de processamento, excelente raciocínio lógico, forte habilidade em padrões complexos e grande aptidão para tarefas que exigem análise crítica e solução de problemas inovadora.";
 }
 
-const iq = calculateIQ(score);
-
-function getMessage(iq) {
-    if (iq < 105) return "Seu desempenho está dentro da média estatística.";
-    if (iq < 120) return "Você demonstra habilidades cognitivas acima da média.";
-    return "Seu resultado indica capacidade intelectual significativamente elevada.";
+return {iq: Math.round(iq), description};
 }
 
-function showPaywall() {
-    document.getElementById("paywall").style.display = "block";
+const contentDiv = document.getElementById("content");
+
+if(paid === "true"){
+
+const profile = generateProfile(score);
+
+contentDiv.innerHTML = `
+<h2>Seu Resultado Está Pronto</h2>
+<h1>QI ${profile.iq}</h1>
+<p>${profile.description}</p>
+<p class="small">Pontuação bruta: ${score}/30</p>
+`;
+
+}else{
+
+contentDiv.innerHTML = `
+<h2>Seu resultado está pronto</h2>
+<p>Seu desempenho foi analisado com base em padrões psicométricos globais.</p>
+<button onclick="startPayment()">Desbloquear Resultado por $0.99</button>
+`;
+
 }
 
-function revealResult() {
-    const iqEl = document.getElementById("iqValue");
-    const msgEl = document.getElementById("message");
-
-    iqEl.innerText = iq;
-    msgEl.innerText = getMessage(iq);
-
-    iqEl.classList.add("unlocked");
-    msgEl.classList.add("unlocked");
-
-    setTimeout(() => {
-        document.getElementById("progressBar").style.width = (iq / 140 * 100) + "%";
-    }, 300);
-
-    document.getElementById("paywall").style.display = "none";
-    document.getElementById("shareBtn").style.display = "block";
+function startPayment(){
+window.location.href="https://buy.stripe.com/test_eVq28k4ZS6oxb8Rfjs18c00";
 }
-
-function startPayment() { 
-    window.location.href = "https://buy.stripe.com/test_eVq28k4ZS6oxb8Rfjs18c00" ;
-    
-    localStorage.setItem("paid", "true");
-    revealResult();
-}
-
-function shareResult() {
-    const text = `Meu QI estimado foi ${iq}. Faça o teste também!`;
-
-    if (navigator.share) {
-        navigator.share({
-            title: "Meu Resultado de QI",
-            text: text,
-            url: window.location.href
-        });
-    } else {
-        navigator.clipboard.writeText(text);
-        alert("Resultado copiado!");
-    }
-}
-
-if (paid) {
-    revealResult();
-} else {
-    setTimeout(showPaywall, 2500); // Delay psicológico antes de mostrar preço
-}
-
 </script>
 
 </body>
