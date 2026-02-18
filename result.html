@@ -198,10 +198,8 @@ function revealResult() {
     document.getElementById("shareBtn").style.display = "block";
 }
 
-function startPayment() {
-    // Aqui você conecta Stripe Checkout real
-    // Exemplo:
-    // window.location.href = "https://checkout.stripe.com/...";
+function startPayment() { 
+    window.location.href = "https://buy.stripe.com/test_eVq28k4ZS6oxb8Rfjs18c00" ;
     
     localStorage.setItem("paid", "true");
     revealResult();
